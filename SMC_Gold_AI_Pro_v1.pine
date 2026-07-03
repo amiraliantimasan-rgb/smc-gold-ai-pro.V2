@@ -1,51 +1,64 @@
 //@version=5
-indicator("SMC Gold AI PRO v1.0 - Core Engine", overlay=true, max_labels_count=500)
+indicator("SMC Gold AI PRO v1.1 - Market Structure BOS/CHoCH", overlay=true, max_labels_count=500)
 
 //========================
 // Inputs
 //========================
 leftBars  = input.int(5, "Left Bars", minval=1)
 rightBars = input.int(5, "Right Bars", minval=1)
-showLabels = input.bool(true, "Show HH HL LH LL")
+showLabels = input.bool(true, "Show Structure Labels")
+
+atrLen = input.int(14, "ATR Length")
+atrMult = input.float(0.5, "Body > ATR Multiplier")
 
 //========================
-// Swing Detection (Pivot-based base layer)
-// NOTE: will be replaced later with custom Swing Engine
+// Swing Detection
 //========================
 ph = ta.pivothigh(high, leftBars, rightBars)
 pl = ta.pivotlow(low, leftBars, rightBars)
 
 var float lastHigh = na
 var float lastLow  = na
+var int trend = 0  // 1 bullish, -1 bearish
+
+atr = ta.atr(atrLen)
+body = math.abs(close - open)
 
 //========================
-// Swing High Logic
+// Update Swings
 //========================
 if not na(ph)
-    string txt = na(lastHigh) ? "H" : ph > lastHigh ? "HH" : "LH"
-    if showLabels
-        label.new(
-            bar_index - rightBars,
-            ph,
-            txt,
-            style=label.style_label_down,
-            color=color.red,
-            textcolor=color.white
-        )
     lastHigh := ph
 
-//========================
-// Swing Low Logic
-//========================
 if not na(pl)
-    string txt = na(lastLow) ? "L" : pl > lastLow ? "HL" : "LL"
-    if showLabels
-        label.new(
-            bar_index - rightBars,
-            pl,
-            txt,
-            style=label.style_label_up,
-            color=color.green,
-            textcolor=color.white
-        )
     lastLow := pl
+
+//========================
+// Institutional BOS Filter
+//========================
+bullStrength = body > atr * atrMult and close > open
+bearStrength = body > atr * atrMult and close < open
+
+//========================
+// BOS / CHoCH Logic
+//========================
+
+bullBreak = not na(lastHigh) and close > lastHigh and bullStrength
+bearBreak = not na(lastLow) and close < lastLow and bearStrength
+
+if bullBreak
+    label.new(bar_index, high, trend == -1 ? "CHoCH ↑" : "BOS ↑", style=label.style_label_up, color=color.green, textcolor=color.white)
+    trend := 1
+
+if bearBreak
+    label.new(bar_index, low, trend == 1 ? "CHoCH ↓" : "BOS ↓", style=label.style_label_down, color=color.red, textcolor=color.white)
+    trend := -1
+
+//========================
+// Optional Swing Labels
+//========================
+if showLabels and not na(ph)
+    label.new(bar_index - rightBars, ph, "SH", style=label.style_label_down, color=color.gray, textcolor=color.white)
+
+if showLabels and not na(pl)
+    label.new(bar_index - rightBars, pl, "SL", style=label.style_label_up, color=color.gray, textcolor=color.white)
