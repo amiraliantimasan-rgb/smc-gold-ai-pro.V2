@@ -1,0 +1,51 @@
+//@version=5
+indicator("SMC Gold AI PRO v1.0 - Core Engine", overlay=true, max_labels_count=500)
+
+//========================
+// Inputs
+//========================
+leftBars  = input.int(5, "Left Bars", minval=1)
+rightBars = input.int(5, "Right Bars", minval=1)
+showLabels = input.bool(true, "Show HH HL LH LL")
+
+//========================
+// Swing Detection (Pivot-based base layer)
+// NOTE: will be replaced later with custom Swing Engine
+//========================
+ph = ta.pivothigh(high, leftBars, rightBars)
+pl = ta.pivotlow(low, leftBars, rightBars)
+
+var float lastHigh = na
+var float lastLow  = na
+
+//========================
+// Swing High Logic
+//========================
+if not na(ph)
+    string txt = na(lastHigh) ? "H" : ph > lastHigh ? "HH" : "LH"
+    if showLabels
+        label.new(
+            bar_index - rightBars,
+            ph,
+            txt,
+            style=label.style_label_down,
+            color=color.red,
+            textcolor=color.white
+        )
+    lastHigh := ph
+
+//========================
+// Swing Low Logic
+//========================
+if not na(pl)
+    string txt = na(lastLow) ? "L" : pl > lastLow ? "HL" : "LL"
+    if showLabels
+        label.new(
+            bar_index - rightBars,
+            pl,
+            txt,
+            style=label.style_label_up,
+            color=color.green,
+            textcolor=color.white
+        )
+    lastLow := pl
