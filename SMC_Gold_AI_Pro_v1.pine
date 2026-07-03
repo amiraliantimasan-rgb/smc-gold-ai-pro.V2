@@ -1,15 +1,17 @@
 //@version=5
-indicator("SMC Gold AI PRO v1.1 - Market Structure BOS/CHoCH", overlay=true, max_labels_count=500)
+indicator("SMC Gold AI PRO v1.2 - Strong Signals Engine", overlay=true, max_labels_count=500)
 
 //========================
 // Inputs
 //========================
 leftBars  = input.int(5, "Left Bars", minval=1)
 rightBars = input.int(5, "Right Bars", minval=1)
-showLabels = input.bool(true, "Show Structure Labels")
+showLabels = input.bool(true, "Show Structure")
+showSignals = input.bool(true, "Show BUY/SELL Signals")
 
 atrLen = input.int(14, "ATR Length")
-atrMult = input.float(0.5, "Body > ATR Multiplier")
+atrMult = input.float(0.6, "Institutional ATR Mult")
+strongMult = input.float(1.2, "Strong Signal ATR Mult")
 
 //========================
 // Swing Detection
@@ -19,7 +21,7 @@ pl = ta.pivotlow(low, leftBars, rightBars)
 
 var float lastHigh = na
 var float lastLow  = na
-var int trend = 0  // 1 bullish, -1 bearish
+var int trend = 0
 
 atr = ta.atr(atrLen)
 body = math.abs(close - open)
@@ -29,36 +31,54 @@ body = math.abs(close - open)
 //========================
 if not na(ph)
     lastHigh := ph
-
 if not na(pl)
     lastLow := pl
 
 //========================
-// Institutional BOS Filter
+// Strength Filters
 //========================
 bullStrength = body > atr * atrMult and close > open
 bearStrength = body > atr * atrMult and close < open
 
-//========================
-// BOS / CHoCH Logic
-//========================
+strongBull = body > atr * strongMult and close > open
+strongBear = body > atr * strongMult and close < open
 
+//========================
+// Break Logic
+//========================
 bullBreak = not na(lastHigh) and close > lastHigh and bullStrength
 bearBreak = not na(lastLow) and close < lastLow and bearStrength
 
+//========================
+// Structure Events
+//========================
 if bullBreak
-    label.new(bar_index, high, trend == -1 ? "CHoCH ↑" : "BOS ↑", style=label.style_label_up, color=color.green, textcolor=color.white)
+    isChoch = trend == -1
+    label.new(bar_index, high, isChoch ? "CHoCH ↑" : "BOS ↑", style=label.style_label_up, color=color.green, textcolor=color.white)
     trend := 1
 
 if bearBreak
-    label.new(bar_index, low, trend == 1 ? "CHoCH ↓" : "BOS ↓", style=label.style_label_down, color=color.red, textcolor=color.white)
+    isChoch = trend == 1
+    label.new(bar_index, low, isChoch ? "CHoCH ↓" : "BOS ↓", style=label.style_label_down, color=color.red, textcolor=color.white)
     trend := -1
 
 //========================
-// Optional Swing Labels
+// Strong BUY/SELL Signals
+//========================
+strongBuy = showSignals and trend == 1 and bullBreak and strongBull
+strongSell = showSignals and trend == -1 and bearBreak and strongBear
+
+if strongBuy
+    label.new(bar_index, low, "STRONG BUY", style=label.style_label_up, color=color.lime, textcolor=color.black)
+
+if strongSell
+    label.new(bar_index, high, "STRONG SELL", style=label.style_label_down, color=color.red, textcolor=color.white)
+
+//========================
+// Swing Markers
 //========================
 if showLabels and not na(ph)
-    label.new(bar_index - rightBars, ph, "SH", style=label.style_label_down, color=color.gray, textcolor=color.white)
+    label.new(bar_index - rightBars, ph, "SH", color=color.gray, textcolor=color.white)
 
 if showLabels and not na(pl)
-    label.new(bar_index - rightBars, pl, "SL", style=label.style_label_up, color=color.gray, textcolor=color.white)
+    label.new(bar_index - rightBars, pl, "SL", color=color.gray, textcolor=color.white)
