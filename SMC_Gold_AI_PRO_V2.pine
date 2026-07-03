@@ -45,12 +45,14 @@ if bearBreak
 //==============================
 // VISUALIZATION
 //==============================
-if showSwings
-    plotshape(not na(pH), title="Swing High", style=shape.triangledown, location=location.abovebar, size=size.tiny, color=color.red, text="SH")
-    plotshape(not na(pL), title="Swing Low", style=shape.triangleup, location=location.belowbar, size=size.tiny, color=color.green, text="SL")
+plotshape(showSwings and not na(pH), title="Swing High", style=shape.triangledown, location=location.abovebar, size=size.tiny, color=color.red, text="SH")
 
-if showMS
-    plotshape(bosUp, title="BOS Up", style=shape.labelup, location=location.belowbar, color=color.green, text="BOS")
-    plotshape(chochUp, title="CHoCH Up", style=shape.labelup, location=location.belowbar, color=color.lime, text="CHoCH")
-    plotshape(bosDn, title="BOS Down", style=shape.labeldown, location=location.abovebar, color=color.red, text="BOS")
-    plotshape(chochDn, title="CHoCH Down", style=shape.labeldown, location=location.abovebar, color=color.orange, text="CHoCH")
+plotshape(showSwings and not na(pL), title="Swing Low", style=shape.triangleup, location=location.belowbar, size=size.tiny, color=color.green, text="SL")
+
+plotshape(showMS and bosUp, title="BOS Up", style=shape.labelup, location=location.belowbar, color=color.green, text="BOS")
+
+plotshape(showMS and chochUp, title="CHoCH Up", style=shape.labelup, location=location.belowbar, color=color.lime, text="CHoCH")
+
+plotshape(showMS and bosDn, title="BOS Down", style=shape.labeldown, location=location.abovebar, color=color.red, text="BOS")
+
+plotshape(showMS and chochDn, title="CHoCH Down", style=shape.labeldown, location=location.abovebar, color=color.orange, text="CHoCH")
