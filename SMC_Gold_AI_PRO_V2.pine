@@ -1,5 +1,30 @@
 //@version=6
-indicator("SMC Gold AI PRO V2", overlay=true)
+indicator("SMC Gold AI PRO V2", overlay=true, max_lines_count=500, max_labels_count=500)
 
-// Test update
-plot(close)
+//==============================
+// INPUTS
+//==============================
+group_ms = "Market Structure"
+swingLen = input.int(5, "Swing Length", minval=2, group=group_ms)
+showSwings = input.bool(true, "Show Swings", group=group_ms)
+
+//==============================
+// SWING DETECTION (NON-REPAINT BASE)
+//==============================
+pH = ta.pivothigh(high, swingLen, swingLen)
+pL = ta.pivotlow(low, swingLen, swingLen)
+
+var float lastHigh = na
+var float lastLow = na
+
+if not na(pH)
+    lastHigh := pH
+if not na(pL)
+    lastLow := pL
+
+//==============================
+// VISUALIZATION
+//==============================
+if showSwings
+    plotshape(not na(pH), title="Swing High", style=shape.triangledown, location=location.abovebar, size=size.tiny, color=color.red, text="SH")
+    plotshape(not na(pL), title="Swing Low", style=shape.triangleup, location=location.belowbar, size=size.tiny, color=color.green, text="SL")
