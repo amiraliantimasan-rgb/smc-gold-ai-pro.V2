@@ -1,16 +1,34 @@
 //@version=6
-indicator("SMC Gold AI PRO v0.1", overlay=true, max_lines_count=500, max_labels_count=500)
+indicator("SMC Gold AI PRO v0.2", overlay=true, max_lines_count=500, max_labels_count=500, max_boxes_count=500)
 
-// Project initialized.
-// Target: XAUUSD
-// Architecture modules:
-// - Swing Engine
-// - Structure
-// - BOS / CHoCH
-// - Liquidity
-// - Order Blocks
-// - Fair Value Gap
-// - AI Score
-// - Entry Engine
+// ============================================================================
+// SMC Gold AI PRO
+// Institutional Edition
+// Target Market : XAUUSD ONLY
+// Status : Active Development
+// ============================================================================
 
+// CORE DESIGN RULES
+// • No Repaint
+// • External Structure drives bias
+// • Internal Structure used for execution
+// • High-probability setups only
+// • Ignore weak setups
+// • AI Score filter before any signal
+//
+// Planned modules:
+// 1. Swing Engine (custom)
+// 2. Market Structure
+// 3. BOS / CHoCH
+// 4. Liquidity Sweep
+// 5. Displacement Engine
+// 6. Order Block
+// 7. Fair Value Gap
+// 8. Premium / Discount
+// 9. OTE
+// 10. AI Confidence Engine
+// 11. Entry / TP / SL
+// 12. Dashboard & Alerts
+
+// Temporary placeholder while core engine is implemented.
 plot(close, display=display.none)
