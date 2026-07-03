@@ -1,2 +1,5 @@
 //@version=6
 indicator("SMC Gold AI PRO V2", overlay=true)
+
+// Test update
+plot(close)
