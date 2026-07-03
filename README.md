@@ -1,0 +1,1 @@
+# smc-gold-ai-pro.V2
