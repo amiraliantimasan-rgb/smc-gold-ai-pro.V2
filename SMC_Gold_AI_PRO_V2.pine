@@ -8,34 +8,56 @@ group_ms = "Market Structure"
 swingLen = input.int(5, "Swing Length", minval=2, group=group_ms)
 showSwings = input.bool(true, "Show Swings", group=group_ms)
 showMS = input.bool(true, "Show BOS/CHoCH", group=group_ms)
+showStruct = input.bool(true, "Show HH/HL/LH/LL", group=group_ms)
 
 //==============================
-// SWING DETECTION (NON-REPAINT BASE)
+// SWING DETECTION
 //==============================
 pH = ta.pivothigh(high, swingLen, swingLen)
 pL = ta.pivotlow(low, swingLen, swingLen)
 
-var float lastHigh = na
-var float lastLow = na
+//==============================
+// STRUCTURE STORAGE
+//==============================
+var float prevHigh = na
+var float prevLow  = na
 
+var float lastHigh = na
+var float lastLow  = na
+
+//==============================
+// UPDATE SWINGS
+//==============================
 if not na(pH)
+    prevHigh := lastHigh
     lastHigh := pH
+
 if not na(pL)
+    prevLow := lastLow
     lastLow := pL
 
 //==============================
-// MARKET STRUCTURE STATE
+// CLASSIFY STRUCTURE
 //==============================
-var int trend = 0  // 1 bullish, -1 bearish, 0 unknown
+HH = not na(prevHigh) and not na(lastHigh) and lastHigh > prevHigh
+LH = not na(prevHigh) and not na(lastHigh) and lastHigh <= prevHigh
+
+HL = not na(prevLow) and not na(lastLow) and lastLow > prevLow
+LL = not na(prevLow) and not na(lastLow) and lastLow <= prevLow
+
+//==============================
+// MARKET STRUCTURE STATE (BOS/CHoCH)
+//==============================
+var int trend = 0
 
 bullBreak = not na(lastHigh) and close > lastHigh
 bearBreak = not na(lastLow) and close < lastLow
 
 bosUp = bullBreak and trend == 1
-chochUp = bullBreak and trend == -1 or (bullBreak and trend == 0)
+chochUp = bullBreak and (trend == -1 or trend == 0)
 
 bosDn = bearBreak and trend == -1
-chochDn = bearBreak and trend == 1 or (bearBreak and trend == 0)
+chochDn = bearBreak and (trend == 1 or trend == 0)
 
 if bullBreak
     trend := 1
@@ -46,13 +68,18 @@ if bearBreak
 // VISUALIZATION
 //==============================
 plotshape(showSwings and not na(pH), title="Swing High", style=shape.triangledown, location=location.abovebar, size=size.tiny, color=color.red, text="SH")
-
 plotshape(showSwings and not na(pL), title="Swing Low", style=shape.triangleup, location=location.belowbar, size=size.tiny, color=color.green, text="SL")
 
 plotshape(showMS and bosUp, title="BOS Up", style=shape.labelup, location=location.belowbar, color=color.green, text="BOS")
-
 plotshape(showMS and chochUp, title="CHoCH Up", style=shape.labelup, location=location.belowbar, color=color.lime, text="CHoCH")
-
 plotshape(showMS and bosDn, title="BOS Down", style=shape.labeldown, location=location.abovebar, color=color.red, text="BOS")
-
 plotshape(showMS and chochDn, title="CHoCH Down", style=shape.labeldown, location=location.abovebar, color=color.orange, text="CHoCH")
+
+//==============================
+// STRUCTURE LABELS
+//==============================
+plotshape(showStruct and HH and not na(pH), title="HH", style=shape.labeldown, location=location.abovebar, color=color.new(color.green, 0), text="HH")
+plotshape(showStruct and LH and not na(pH), title="LH", style=shape.labeldown, location=location.abovebar, color=color.new(color.red, 0), text="LH")
+
+plotshape(showStruct and HL and not na(pL), title="HL", style=shape.labelup, location=location.belowbar, color=color.new(color.green, 0), text="HL")
+plotshape(showStruct and LL and not na(pL), title="LL", style=shape.labelup, location=location.belowbar, color=color.new(color.red, 0), text="LL")
