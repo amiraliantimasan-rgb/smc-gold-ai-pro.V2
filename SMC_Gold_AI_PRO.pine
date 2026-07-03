@@ -1,34 +1,30 @@
 //@version=6
-indicator("SMC Gold AI PRO v0.2", overlay=true, max_lines_count=500, max_labels_count=500, max_boxes_count=500)
+indicator("SMC Gold AI PRO v0.3", overlay=true, max_lines_count=500, max_labels_count=500, max_boxes_count=500)
 
-// ============================================================================
-// SMC Gold AI PRO
-// Institutional Edition
-// Target Market : XAUUSD ONLY
-// Status : Active Development
-// ============================================================================
+// SMC Gold AI PRO - Institutional Edition
+// XAUUSD ONLY
+// Active development build
 
-// CORE DESIGN RULES
-// • No Repaint
-// • External Structure drives bias
-// • Internal Structure used for execution
-// • High-probability setups only
-// • Ignore weak setups
-// • AI Score filter before any signal
-//
-// Planned modules:
-// 1. Swing Engine (custom)
-// 2. Market Structure
-// 3. BOS / CHoCH
-// 4. Liquidity Sweep
-// 5. Displacement Engine
-// 6. Order Block
-// 7. Fair Value Gap
-// 8. Premium / Discount
-// 9. OTE
-// 10. AI Confidence Engine
-// 11. Entry / TP / SL
-// 12. Dashboard & Alerts
+// === Inputs ===
+string analysisTF = input.timeframe("15", "Structure Timeframe")
+int swingLength = input.int(5, "Swing Length", minval=2)
+bool institutionalOnly = input.bool(true, "Institutional Filter")
+int minAIScore = input.int(90, "Minimum AI Score", minval=50, maxval=100)
 
-// Temporary placeholder while core engine is implemented.
+// === Development Roadmap ===
+// [ ] Custom Swing Engine
+// [ ] External Structure
+// [ ] Internal Structure
+// [ ] BOS / CHoCH
+// [ ] Liquidity Sweep
+// [ ] Displacement
+// [ ] Order Blocks
+// [ ] Fair Value Gap
+// [ ] OTE
+// [ ] AI Confidence
+// [ ] Entry Engine
+// [ ] Dashboard
+// [ ] Alerts
+
+// Placeholder to keep script valid while core engine is implemented.
 plot(close, display=display.none)
