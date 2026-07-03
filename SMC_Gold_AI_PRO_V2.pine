@@ -7,6 +7,7 @@ indicator("SMC Gold AI PRO V2", overlay=true, max_lines_count=500, max_labels_co
 group_ms = "Market Structure"
 swingLen = input.int(5, "Swing Length", minval=2, group=group_ms)
 showSwings = input.bool(true, "Show Swings", group=group_ms)
+showMS = input.bool(true, "Show BOS/CHoCH", group=group_ms)
 
 //==============================
 // SWING DETECTION (NON-REPAINT BASE)
@@ -23,8 +24,33 @@ if not na(pL)
     lastLow := pL
 
 //==============================
+// MARKET STRUCTURE STATE
+//==============================
+var int trend = 0  // 1 bullish, -1 bearish, 0 unknown
+
+bullBreak = not na(lastHigh) and close > lastHigh
+bearBreak = not na(lastLow) and close < lastLow
+
+bosUp = bullBreak and trend == 1
+chochUp = bullBreak and trend == -1 or (bullBreak and trend == 0)
+
+bosDn = bearBreak and trend == -1
+chochDn = bearBreak and trend == 1 or (bearBreak and trend == 0)
+
+if bullBreak
+    trend := 1
+if bearBreak
+    trend := -1
+
+//==============================
 // VISUALIZATION
 //==============================
 if showSwings
     plotshape(not na(pH), title="Swing High", style=shape.triangledown, location=location.abovebar, size=size.tiny, color=color.red, text="SH")
     plotshape(not na(pL), title="Swing Low", style=shape.triangleup, location=location.belowbar, size=size.tiny, color=color.green, text="SL")
+
+if showMS
+    plotshape(bosUp, title="BOS Up", style=shape.labelup, location=location.belowbar, color=color.green, text="BOS")
+    plotshape(chochUp, title="CHoCH Up", style=shape.labelup, location=location.belowbar, color=color.lime, text="CHoCH")
+    plotshape(bosDn, title="BOS Down", style=shape.labeldown, location=location.abovebar, color=color.red, text="BOS")
+    plotshape(chochDn, title="CHoCH Down", style=shape.labeldown, location=location.abovebar, color=color.orange, text="CHoCH")
